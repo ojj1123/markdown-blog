@@ -1,34 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Markdown blog
 
-## Getting Started
+## SSG란?
 
-First, run the development server:
+- SSG(Static site Generation)은 빌드 타임에 페이지의 HTML을 생성합니다.
+- 다르게 말하면 next build를 실행했을 때 HTML이 생성됩니다.
+- 이렇게 생성된 HTML은 각각의 요청마다 재사용될 수 있고, **CDN**에 캐시되어 제공될 수 있습니다.
 
-```bash
-npm run dev
-# or
-yarn dev
+## Next.js에서는 SSG를 어떻게 구현할까요?
+
+- 기본적으로 Next.js는 Static Generation을 제공합니다.
+- 만약 외부 데이터를 불러와서 pre rendering을 해야하는 경우 `getStaticProps`와 `getStaticPaths` API를 이용해서 빌드 타임에 데이터를 불러와 pre rendering해줄 수 있습니다.
+
+예시
+
+```js
+// pages/posts/[id].js
+
+// Generates `/posts/1` and `/posts/2`
+export async function getStaticPaths() {
+  return {
+    paths: [{ params: { id: '1' } }, { params: { id: '2' } }],
+    fallback: false, // can also be true or 'blocking'
+  };
+}
+
+// `getStaticPaths` requires using `getStaticProps`
+export async function getStaticProps(context) {
+  return {
+    // Passed to the page component as props
+    props: { post: {} },
+  };
+}
+
+export default function Post({ post }) {
+  // Render post...
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- getStaticProps: getStaticProps에 의해 반환된 props를 사용해서 빌드타임에 페이지를 pre rendering 합니다.
+- getStaticPaths: Dynamic Routes를 사용하는 페이지를 pre rendering 합니다.
+- getStaticProps, getStaticPaths는 서버에서 빌드 타임에만 호출되고 클라이언트에서는 호출되지 않습니다.
+- 클라이언트 번들에서는 제거됩니다.[참고](https://next-code-elimination.vercel.app/)

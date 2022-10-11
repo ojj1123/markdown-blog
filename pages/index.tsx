@@ -1,13 +1,14 @@
-import type { NextPage } from 'next';
+import type { InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '../components/layout';
 import { getSortedPostsData } from '../lib/posts';
 
 const siteTitle = 'Next.js Sample blog';
 
-const Home: NextPage = ({ allPostsData }) => {
+const Home = ({
+  allPostsData,
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <Layout home>
       <Head>
@@ -35,12 +36,13 @@ const Home: NextPage = ({ allPostsData }) => {
   );
 };
 
-export async function getStaticProps() {
+export const getStaticProps = async () => {
   const allPostsData = getSortedPostsData();
   return {
     props: {
       allPostsData,
     },
   };
-}
+};
+
 export default Home;

@@ -4,11 +4,13 @@ import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
 
-type PostData = {
+type MatterResult = {
   id: string;
-  date: string;
   title: string;
+  date: string;
+  content: string;
 };
+
 const postsDirectory = path.join(process.cwd(), '__posts');
 
 export function getSortedPostsData() {
@@ -24,7 +26,7 @@ export function getSortedPostsData() {
       id,
       ...matterResult.data,
     };
-  });
+  }) as unknown as MatterResult[];
 
   return allPostsData.sort(({ date: a }, { date: b }) => {
     if (a < b) return 1;

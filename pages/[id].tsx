@@ -1,11 +1,9 @@
+import type { GetStaticProps, InferGetStaticPropsType } from 'next';
 import Head from 'next/head';
 import Date from '../components/date';
 import Layout from '../components/layout';
 import { getAllPostIds, getPostData } from '../lib/posts';
 
-type Context = {
-  params: { id: string };
-};
 interface Props {
   postData: {
     id: string;
@@ -14,7 +12,7 @@ interface Props {
     date: string;
   };
 }
-const Post: React.FC<Props> = ({ postData }) => {
+const Post = ({ postData }: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <Layout>
       <Head>
@@ -36,13 +34,19 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({ params }: Context) {
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  if (!params?.id || Array.isArray(params.id)) {
+    return {
+      props: {},
+    };
+  }
+
   const postData = await getPostData(params.id);
   return {
     props: {
       postData,
     },
   };
-}
+};
 
 export default Post;
